@@ -4,12 +4,6 @@ require("dotenv").config();
 var keys = require("./assets/scripts/keys.js")
 var packages = require("./assets/scripts/packages.js");
 
-// Figlet preloading
-packages.figlet.defaults({
-    fontPath: "node_modules/figlet/fonts"
-});
-packages.figlet.preloadFonts(["Standard"], printArt);
-
 var usage = "node liri.js [optional: path to command file]";
 var database, query;
 
@@ -36,6 +30,31 @@ else {
 }
 
 function promptUser() {
+    function printArt() {
+        var artText = "";
+        var omdbText = "~ OMDB ~";
+        var spotifyText = "~ Spotify ~";
+        var bandsText = "~ Bands In Town ~";
+
+        switch (database) {
+            case "omdb":
+                artText = omdbText;
+                break;
+            case "spotify":
+                artText = spotifyText;
+                break;
+            case "bandsInTown":
+                artText = bandsText;
+                break;
+        }
+
+        console.log(packages.figlet.textSync(artText, {
+            font: 'Standard',
+            horizontalLayout: 'default',
+            verticalLayout: 'default'
+        }));
+    }
+
     // Prompt user for database (list) and the desired action (input)
     packages.inquirer.prompt([{
         name: "database",
@@ -55,6 +74,7 @@ function promptUser() {
                 break;
         }
 
+        printArt();
         promptQuery();
     })
 
@@ -86,15 +106,47 @@ function promptQuery() {
         queryDatabase();
     })
 
+}
 
+function promptRestart() {
+    var term = "";
+    switch (database) {
+        case "omdb":
+            term = "movie";
+            break;
+        case "spotify":
+            term = "song";
+            break;
+        case "bandsInTown":
+            term = "concert";
+            break;
+    }
+
+    var restartChoices = [`Search up another ${term}!`, "Search within another database!"];
+
+    packages.inquirer.prompt([{
+        message: "What would you like to do next?",
+        name: "choice",
+        type: "list",
+        choices: restartChoices
+
+    }]).then(function (answers) {
+        switch (answers.choice) {
+            case `Search up another ${term}!`:
+                promptQuery();
+                break;
+            case "Search within another database!":
+                promptUser();
+                break;
+        }
+    })
 }
 
 function queryDatabase() {
-    printArt();
 
     switch (database) {
         case "omdb":
-            query = formatMovieQuery();
+            query = formatMovieQuery(query);
             queryMovie();
             break;
         case "spotify":
@@ -118,6 +170,10 @@ function queryDatabase() {
                         return queryPrompt();
                     } else {
                         // Log out information here
+                        console.log(`${response.data.Title} data has been retrieved!`);
+
+                        // Prompt user for another input
+                        promptRestart();
 
                     }
                 })
@@ -143,8 +199,8 @@ function queryDatabase() {
             });
     }
 
-    function formatMovieQuery(query) {
-        var formattedQuery = query.join("+");
+    function formatMovieQuery(unformattedQuery) {
+        var formattedQuery = unformattedQuery.split(' ').join('+');
         return formattedQuery;
     }
 
@@ -152,33 +208,4 @@ function queryDatabase() {
 
     function queryConcert() {}
 
-    function printArt() {
-        var artText = "";
-        var omdbText = "~ OMDB ~";
-        var spotifyText = "~ Spotify ~";
-        var bandsText = "~ Bands In Town ~";
-
-        switch (database) {
-            case "omdb":
-                artText = omdbText;
-                break;
-            case "spotify":
-                artText = spotifyText;
-                break;
-            case "bandsInTown":
-                artText = bandsText;
-                break;
-        }
-
-        console.log(figlet.textSync(artText));
-    }
 }
-
-
-// ----- queryDatabase function() ----- //
-// Switch Case Statement for each database
-// Once database is chosen, print out database ASCII Art (figlet)
-// Within each case, call the proper function from the appropriate package
-// Perform error catching:
-// Upon error, inform user and provide the option to...  1. prompt for a new search term => invoke queryDatabase(curr_database, newQuery) 2. Start from the beginning => invoke liri-start()
-// Log out the information requested and prompt new query from the same database or from a new one (invoke liri-start())
