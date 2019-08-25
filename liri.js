@@ -19,7 +19,18 @@ if (process.argv[2]) {
         }
 
         var commandArgs = data.split(",");
-        database = commandArgs[0];
+        switch (commandArgs[0]) {
+            case "movie":
+                database = "omdb";
+                break;
+            case "music":
+                database = "spotify";
+                break;
+            case "concert":
+                database = "bandsInTown";
+                break;
+        }
+
         query = commandArgs[1];
         queryDatabase();
     })
