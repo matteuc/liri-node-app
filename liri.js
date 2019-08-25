@@ -60,7 +60,7 @@ function promptUser() {
         }
 
         console.log(packages.figlet.textSync(artText, {
-            font: 'Standard',
+            font: 'ANSI Shadow',
             horizontalLayout: 'default',
             verticalLayout: 'default'
         }));
@@ -85,6 +85,7 @@ function promptUser() {
                 break;
         }
 
+        console.log("\n");
         printArt();
         promptQuery();
     })
