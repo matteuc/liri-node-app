@@ -155,10 +155,10 @@ function promptRestart() {
 }
 
 function queryDatabase() {
+    query = formatQuery(query);
 
     switch (database) {
         case "omdb":
-            query = formatMovieQuery(query);
             queryMovie();
             break;
         case "spotify":
@@ -179,7 +179,7 @@ function queryDatabase() {
                     // If no response was returned (ie. movie was not found)
                     if (response.data.Response == "False") {
                         console.log("Movie was not found! Please try again.");
-                        return queryPrompt();
+                        return promptQuery();
                     } else {
                         // Log out information here
                         console.log(`${response.data.Title} data has been retrieved!`);
@@ -211,13 +211,38 @@ function queryDatabase() {
             });
     }
 
-    function formatMovieQuery(unformattedQuery) {
-        var formattedQuery = unformattedQuery.split(' ').join('+');
+    function formatQuery(unformattedQuery) {
+        var formattedQuery =  
+        unformattedQuery.split(' ').join('+');
         return formattedQuery;
     }
 
-    function queryMusic() {}
+    function queryMusic() {
+       
+            
+    }
 
-    function queryConcert() {}
+    function queryConcert() {
+        var queryURL = "https://rest.bandsintown.com/artists/" + query + "?app_id=codingbootcamp";
+
+        packages.axios.get(queryURL)
+            .then(
+                function (response) {
+                    // If no response was returned (ie. band was not found)
+                    if (response.data.Response == "False") {
+                        console.log("Band was not found! Please try again.");
+                        return promptQuery();
+                    } else {
+                        // Log out information here
+                        
+                       
+                        console.log(`${response.data.name} data was retrieved!`);
+                       
+                        // Prompt user for another input
+                        promptRestart();
+
+                    }
+                })
+    }
 
 }
