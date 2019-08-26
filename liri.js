@@ -324,8 +324,7 @@ function queryDatabase() {
                         printTextArt(artist.name, "ANSI Shadow");
 
                         if (artist.popularity) {
-                            printTextArt(`Ranking`, "Stick Letters");
-                            console.log(artist.popularity)
+                            printTextArt(`Ranking: ${artist.popularity}`, "Small Slant");
                         }
 
                         if (artist.genres) {
@@ -395,8 +394,7 @@ function queryDatabase() {
                                 }
 
                                 if (album.popularity) {
-                                    printTextArt("Ranking", "Stick Letters");
-                                    console.log(album.popularity);
+                                    printTextArt(`Ranking: ${album.popularity}`, "Small Slant");
                                 }
 
                                 var trackList = data.items;
