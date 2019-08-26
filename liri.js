@@ -185,7 +185,7 @@ function queryDatabase() {
                         return promptQuery();
                     } else {
                         // Log out information here
-                        console.log(`The best movie match for ${query.split("+").join(" ")} is:\n`.magenta);
+                        console.log(`\nThe best movie match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                         // Print Movie Title
                         printTextArt(response.data.Title, "ANSI Shadow");
@@ -292,7 +292,7 @@ function queryDatabase() {
                         console.log(`No tracks named ${query.split("+").join(" ")} were found!`.red);
                         promptRestart();
                     } else { // Inform user a result has been found
-                        console.log(`The best song match for ${query.split("+").join(" ")} is:\n`.magenta);
+                        console.log(`\nThe best song match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                         // Show formatted result
                         var track = response.tracks.items[0];
@@ -345,7 +345,7 @@ function queryDatabase() {
                         console.log(`No artists named ${query.split("+").join(" ")} were found!`.red);
                         promptRestart();
                     } else { // Inform user a result has been found
-                        console.log(`The best artist match for ${query.split("+").join(" ")} is:\n`.magenta);
+                        console.log(`\nThe best artist match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                         var artist = response.artists.items[0];
                         // Show formatted result
@@ -398,7 +398,7 @@ function queryDatabase() {
                         packages.spotify.request(`https://api.spotify.com/v1/albums/${album.uri.split(":")[2]}/tracks?offset=0`)
                             .then(function (data) {
                                 // Inform user a result has been found
-                                console.log(`The best album match for ${query.split("+").join(" ")} is:\n`.magenta);
+                                console.log(`\nThe best album match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                                 // Show formatted result
 
