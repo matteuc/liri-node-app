@@ -1,6 +1,6 @@
-console.log('Loading...');
+console.log('Loading complete!');
 
-exports.spotify = {
+exports.spotifyConfig = {
   id: process.env.SPOTIFY_ID,
   secret: process.env.SPOTIFY_SECRET
 };

@@ -1,7 +1,5 @@
 require("dotenv").config();
 
-
-var keys = require("./assets/scripts/keys.js")
 var packages = require("./assets/scripts/packages.js");
 
 var usage = "node liri.js [optional: path to command file]";
@@ -40,8 +38,9 @@ else {
     promptUser();
 }
 
+// Ask user what they would like to do?
 function promptUser() {
-    function printArt() {
+    function printDatabaseArt() {
         var artText = "";
         var omdbText = "~ OMDB ~";
         var spotifyText = "~ Spotify ~";
@@ -86,15 +85,16 @@ function promptUser() {
         }
 
         console.log("\n");
-        printArt();
+        printDatabaseArt();
         promptQuery();
     })
 
 }
 
+// Ask user what they would like to search for
 function promptQuery() {
     var moviePrompt = "What film would you like to know more about?";
-    var musicPrompt = "What song do you want to jam out today?";
+    var musicPrompt = "What do you want to jam out to today?";
     var concertPrompt = "What concert do you want to go to?";
     var queryPrompt = "";
 
@@ -120,6 +120,7 @@ function promptQuery() {
 
 }
 
+// Ask user what they would like to do for their next action (after a database query)
 function promptRestart() {
     var term = "";
     switch (database) {
@@ -127,7 +128,7 @@ function promptRestart() {
             term = "movie";
             break;
         case "spotify":
-            term = "song";
+            term = "song, artist, or album";
             break;
         case "bandsInTown":
             term = "concert";
@@ -154,6 +155,7 @@ function promptRestart() {
     })
 }
 
+// Query the desired database
 function queryDatabase() {
     query = formatQuery(query);
 
@@ -212,14 +214,152 @@ function queryDatabase() {
     }
 
     function formatQuery(unformattedQuery) {
-        var formattedQuery =  
-        unformattedQuery.split(' ').join('+');
+        var formattedQuery =
+            unformattedQuery.split(' ').join('+');
         return formattedQuery;
     }
 
     function queryMusic() {
-       
-            
+        var optionPrompts = {
+            trackPrompt: "... a song?",
+            artistPrompt: "... an artist?",
+            albumPrompt: "... an album?"
+        }
+        packages.inquirer.prompt({
+            name: "apiOption",
+            type: "list",
+            message: `Would you like to search ${query.split("+").join(" ")} as...`,
+            choices: [optionPrompts.trackPrompt, optionPrompts.artistPrompt, optionPrompts.albumPrompt]
+
+        }).then(function (answers) {
+            console.log("Loading...");
+            switch (answers.apiOption) {
+                case optionPrompts.trackPrompt:
+                    queryTrack();
+                    break;
+                case optionPrompts.artistPrompt:
+                    queryArtist();
+                    break;
+                case optionPrompts.albumPrompt:
+                    queryAlbum();
+                    break;
+            }
+
+        })
+
+
+
+        function queryTrack() {
+            packages.spotify.search({
+                    type: 'track',
+                    query: query
+                })
+                .then(function (response) {
+
+                    if (response.tracks.items.length === 0) {
+                        console.log(`No tracks named ${query.split("+").join(" ")} were found!`);
+                    } else { // Inform user a result has been found
+                        console.log(`The best song match for ${query.split("+").join(" ")} is:`);
+
+                        // Show formatted result
+                        var track = response.tracks.items[0];
+
+                        // Print Track Title
+                        printTextArt(track.name, "Elite");
+
+                        if (track.artists) {
+                            // Print Artists header
+                            printTextArt("Artist(s)", "Stick Letters")
+                            // Print Artists
+                            for (var artist of track.artists) {
+                                console.log(`${artist.name}: https://open.spotify.com/artist/${artist.uri.split(":")[2]}`)
+                            }
+                        }
+
+                        if (track.album) {
+                            // Print Album header 
+                            printTextArt("Album", "Stick Letters");
+                            // Print Album
+                            console.log(`${track.album.name}: https://open.spotify.com/album/${track.album.uri.split(":")[2]}`)
+                        }
+
+                        if (track.uri) {
+                            // Print 'Play Now!' header
+                            printTextArt("Play Now!", "Stick Letters");
+                            // Print link to song
+                            console.log(`${track.name}: https://open.spotify.com/track/${track.uri.split(":")[2]}`);
+                        }
+                        console.log("\n");
+
+
+                    }
+
+                    // Prompt user for another input
+                    promptRestart();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        }
+
+        function queryArtist() {
+            packages.spotify.search({
+                    type: 'artist',
+                    query: query
+                })
+                .then(function (response) {
+                    if (response.artists.items.length === 0) {
+                        console.log(`No artists named ${query.split("+").join(" ")} were found!`);
+                    } else { // Inform user a result has been found
+                        console.log(`The best artist match for ${query.split("+").join(" ")} is:`);
+
+                        // Show formatted result
+                    }
+
+
+
+                    console.log(response);
+                    // printProps(response.artists);
+
+
+                    // Prompt user for another input
+                    promptRestart();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+        }
+
+        function queryAlbum() {
+            packages.spotify.search({
+                    type: 'album',
+                    query: query
+                })
+                .then(function (response) {
+                    if (response.albums.items.length === 0) {
+                        console.log(`No albums named ${query.split("+").join(" ")} were found!`);
+                    } else { // Inform user a result has been found
+                        console.log(`The best album match for ${query.split("+").join(" ")} is:`);
+
+                        // Show formatted result
+                    }
+
+
+
+
+                    // console.log(response);
+                    printProps(response.albums);
+
+
+                    // Prompt user for another input
+                    promptRestart();
+                })
+                .catch(function (err) {
+                    console.log(err);
+                });
+
+        }
+
     }
 
     function queryConcert() {
@@ -234,15 +374,32 @@ function queryDatabase() {
                         return promptQuery();
                     } else {
                         // Log out information here
-                        
-                       
+
+
                         console.log(`${response.data.name} data was retrieved!`);
-                       
+
                         // Prompt user for another input
                         promptRestart();
 
                     }
                 })
     }
+
+}
+
+// Print the properties of the specified object
+function printProps(obj) {
+    for (var prop in obj) {
+        console.log(prop);
+    }
+}
+
+// Print the specified text in the specified font family using 'figaro'
+function printTextArt(text, font) {
+    console.log(packages.figlet.textSync(text, {
+        font: font,
+        horizontalLayout: 'default',
+        verticalLayout: 'default'
+    }));
 
 }
