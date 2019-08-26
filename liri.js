@@ -289,11 +289,10 @@ function queryDatabase() {
                             // Print link to song
                             console.log(`${track.name}: https://open.spotify.com/track/${track.uri.split(":")[2]}`);
                         }
-                        console.log("\n");
-
 
                     }
 
+                    console.log("\n");
                     // Prompt user for another input
                     promptRestart();
                 })
@@ -313,15 +312,31 @@ function queryDatabase() {
                     } else { // Inform user a result has been found
                         console.log(`The best artist match for ${query.split("+").join(" ")} is:`);
 
+                        var artist = response.artists.items[0];
                         // Show formatted result
+
+                        // Print Album Title
+                        printTextArt(artist.name, "Elite");
+
+                        if(artist.popularity) {
+                            printTextArt(`Ranking`, "Stick Letters");
+                            console.log(artist.popularity)
+                        }
+
+                        if(artist.genres.length !== 0) {
+                            printTextArt("Genres", "Stick Letters");
+                            for(var genre of artist.genres) {
+                                console.log(genre);
+                            }                            
+                        }
+
+                        if(artist.uri) {
+                            printTextArt("Artist Profile", "Stick Letters");
+                            console.log(`Link to Profile: https://open.spotify.com/artist/${artist.uri.split(":")[2]}`);
+                        }
                     }
 
-
-
-                    console.log(response);
-                    // printProps(response.artists);
-
-
+                    console.log("\n");
                     // Prompt user for another input
                     promptRestart();
                 })
