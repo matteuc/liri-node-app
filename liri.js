@@ -181,12 +181,42 @@ function queryDatabase() {
                 function (response) {
                     // If no response was returned (ie. movie was not found)
                     if (response.data.Response == "False") {
-                        console.log("Movie was not found! Please try again.");
+                        console.log("Movie was not found! Please try again.".red);
                         return promptQuery();
                     } else {
                         // Log out information here
-                        console.log(`${response.data.Title} data has been retrieved!`);
+                        console.log(`The best movie match for ${query.split("+").join(" ")} is:\n`.magenta);
 
+                        // Print Movie Title
+                        printTextArt(response.data.Title, "ANSI Shadow");
+                        // Print Release Date
+                        printTextArt("Release Date", "Stick Letters")
+                        console.log(response.data.Released.underline);
+                        // Print IMDB Rating of the movie
+                        printTextArt("IMDB", "Stick Letters");
+                        console.log(response.data.imdbRating.yellow);
+
+                        // Print Rotten Tomatoes Rating
+                        printTextArt("Rotten Tomatoes", "Stick Letters");
+                        console.log(response.data.Ratings[1].Value.red);
+
+                        // Print Production Country
+                        printTextArt("Country", "Stick Letters");
+                        console.log(response.data.Country.blue);
+
+                        // Print Language
+                        printTextArt("Language", "Stick Letters");
+                        console.log(response.data.Language.cyan);
+
+                        // Print Plot
+                        printTextArt("Plot", "Stick Letters");
+                        console.log(response.data.Plot.bold)
+
+                        // Print Actors
+                        printTextArt("Cast", "Stick Letters");
+                        console.log(response.data.Actors.green)
+
+                        console.log("\n");
                         // Prompt user for another input
                         promptRestart();
 
@@ -453,7 +483,7 @@ function queryDatabase() {
 
 // Print the properties of the specified object
 function printProps(obj) {
-    for (var prop in obj) {
+    for (var prop of obj) {
         console.log(prop);
     }
 }
