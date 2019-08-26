@@ -260,14 +260,15 @@ function queryDatabase() {
 
                     if (response.tracks.items.length === 0) {
                         console.log(`No tracks named ${query.split("+").join(" ")} were found!`.red);
+                        promptRestart();
                     } else { // Inform user a result has been found
-                        console.log(`The best song match for ${query.split("+").join(" ")} is:`.magenta);
+                        console.log(`The best song match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                         // Show formatted result
                         var track = response.tracks.items[0];
 
                         // Print Track Title
-                        printTextArt(track.name, "Elite");
+                        printTextArt(track.name, "ANSI Shadow");
 
                         if (track.artists) {
                             // Print Artists header
@@ -312,14 +313,15 @@ function queryDatabase() {
                 .then(function (response) {
                     if (response.artists.items.length === 0) {
                         console.log(`No artists named ${query.split("+").join(" ")} were found!`.red);
+                        promptRestart();
                     } else { // Inform user a result has been found
-                        console.log(`The best artist match for ${query.split("+").join(" ")} is:`.magenta);
+                        console.log(`The best artist match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                         var artist = response.artists.items[0];
                         // Show formatted result
 
                         // Print Artist Title
-                        printTextArt(artist.name, "Elite");
+                        printTextArt(artist.name, "ANSI Shadow");
 
                         if (artist.popularity) {
                             printTextArt(`Ranking`, "Stick Letters");
@@ -359,18 +361,20 @@ function queryDatabase() {
                 .then(function (response) {
                     if (response.albums.items.length === 0) {
                         console.log(`No albums named ${query.split("+").join(" ")} were found!`.red);
+
+                        promptRestart();
                     } else {
                         var album = response.albums.items[0];
 
                         packages.spotify.request(`https://api.spotify.com/v1/albums/${album.uri.split(":")[2]}/tracks?offset=0`)
                             .then(function (data) {
                                 // Inform user a result has been found
-                                console.log(`The best album match for ${query.split("+").join(" ")} is:`.magenta);
+                                console.log(`The best album match for ${query.split("+").join(" ")} is:\n`.magenta);
 
                                 // Show formatted result
 
                                 // Print Album Title
-                                printTextArt(album.name, "Elite");
+                                printTextArt(album.name, "ANSI Shadow");
 
                                 if (album.artists) {
                                     printTextArt(`Artists`, "Stick Letters");
@@ -456,7 +460,7 @@ function printProps(obj) {
     }
 }
 
-// Print the specified text in the specified font family using 'figaro'
+// Print the specified text in the specified font family using 'figlet'
 function printTextArt(text, font) {
     console.log(packages.figlet.textSync(text, {
         font: font,
