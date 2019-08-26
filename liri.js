@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+var colors = require('colors');
 var packages = require("./assets/scripts/packages.js");
 
 var usage = "node liri.js [optional: path to command file]";
@@ -232,7 +233,7 @@ function queryDatabase() {
             choices: [optionPrompts.trackPrompt, optionPrompts.artistPrompt, optionPrompts.albumPrompt]
 
         }).then(function (answers) {
-            console.log("Loading...");
+            console.log("Loading...".yellow);
             switch (answers.apiOption) {
                 case optionPrompts.trackPrompt:
                     queryTrack();
@@ -252,14 +253,15 @@ function queryDatabase() {
         function queryTrack() {
             packages.spotify.search({
                     type: 'track',
-                    query: query
+                    query: query,
+                    limit: 1
                 })
                 .then(function (response) {
 
                     if (response.tracks.items.length === 0) {
-                        console.log(`No tracks named ${query.split("+").join(" ")} were found!`);
+                        console.log(`No tracks named ${query.split("+").join(" ")} were found!`.red);
                     } else { // Inform user a result has been found
-                        console.log(`The best song match for ${query.split("+").join(" ")} is:`);
+                        console.log(`The best song match for ${query.split("+").join(" ")} is:`.magenta);
 
                         // Show formatted result
                         var track = response.tracks.items[0];
@@ -272,7 +274,7 @@ function queryDatabase() {
                             printTextArt("Artist(s)", "Stick Letters")
                             // Print Artists
                             for (var artist of track.artists) {
-                                console.log(`${artist.name}: https://open.spotify.com/artist/${artist.uri.split(":")[2]}`)
+                                console.log(`${artist.name.bold}: ${`https://open.spotify.com/artist/${artist.uri.split(":")[2]}`.cyan}`);
                             }
                         }
 
@@ -280,14 +282,14 @@ function queryDatabase() {
                             // Print Album header 
                             printTextArt("Album", "Stick Letters");
                             // Print Album
-                            console.log(`${track.album.name}: https://open.spotify.com/album/${track.album.uri.split(":")[2]}`)
+                            console.log(`${track.album.name.bold}: ${`https://open.spotify.com/album/${track.album.uri.split(":")[2]}`.cyan}`)
                         }
 
                         if (track.uri) {
                             // Print 'Play Now!' header
                             printTextArt("Play Now!", "Stick Letters");
                             // Print link to song
-                            console.log(`${track.name}: https://open.spotify.com/track/${track.uri.split(":")[2]}`);
+                            console.log(`${track.name.bold}: ${`https://open.spotify.com/track/${track.uri.split(":")[2]}`.green}`);
                         }
 
                     }
@@ -304,35 +306,38 @@ function queryDatabase() {
         function queryArtist() {
             packages.spotify.search({
                     type: 'artist',
-                    query: query
+                    query: query,
+                    limit: 1
                 })
                 .then(function (response) {
                     if (response.artists.items.length === 0) {
-                        console.log(`No artists named ${query.split("+").join(" ")} were found!`);
+                        console.log(`No artists named ${query.split("+").join(" ")} were found!`.red);
                     } else { // Inform user a result has been found
-                        console.log(`The best artist match for ${query.split("+").join(" ")} is:`);
+                        console.log(`The best artist match for ${query.split("+").join(" ")} is:`.magenta);
 
                         var artist = response.artists.items[0];
                         // Show formatted result
 
-                        // Print Album Title
+                        // Print Artist Title
                         printTextArt(artist.name, "Elite");
 
-                        if(artist.popularity) {
+                        if (artist.popularity) {
                             printTextArt(`Ranking`, "Stick Letters");
                             console.log(artist.popularity)
                         }
 
-                        if(artist.genres.length !== 0) {
-                            printTextArt("Genres", "Stick Letters");
-                            for(var genre of artist.genres) {
-                                console.log(genre);
-                            }                            
+                        if (artist.genres) {
+                            if (artist.genres.length !== 0) {
+                                printTextArt("Genres", "Stick Letters");
+                                for (var genre of artist.genres) {
+                                    console.log(genre.yellow);
+                                }
+                            }
                         }
 
-                        if(artist.uri) {
+                        if (artist.uri) {
                             printTextArt("Artist Profile", "Stick Letters");
-                            console.log(`Link to Profile: https://open.spotify.com/artist/${artist.uri.split(":")[2]}`);
+                            console.log(`${"Link to Profile".bold}: ${`https://open.spotify.com/artist/${artist.uri.split(":")[2]}`.green}`);
                         }
                     }
 
@@ -348,26 +353,68 @@ function queryDatabase() {
         function queryAlbum() {
             packages.spotify.search({
                     type: 'album',
-                    query: query
+                    query: query,
+                    limit: 1
                 })
                 .then(function (response) {
                     if (response.albums.items.length === 0) {
-                        console.log(`No albums named ${query.split("+").join(" ")} were found!`);
-                    } else { // Inform user a result has been found
-                        console.log(`The best album match for ${query.split("+").join(" ")} is:`);
+                        console.log(`No albums named ${query.split("+").join(" ")} were found!`.red);
+                    } else {
+                        var album = response.albums.items[0];
 
-                        // Show formatted result
+                        packages.spotify.request(`https://api.spotify.com/v1/albums/${album.uri.split(":")[2]}/tracks?offset=0`)
+                            .then(function (data) {
+                                // Inform user a result has been found
+                                console.log(`The best album match for ${query.split("+").join(" ")} is:`.magenta);
+
+                                // Show formatted result
+
+                                // Print Album Title
+                                printTextArt(album.name, "Elite");
+
+                                if (album.artists) {
+                                    printTextArt(`Artists`, "Stick Letters");
+                                    // Print Artists
+                                    for (var artist of album.artists) {
+                                        console.log(`${artist.name.bold}: ${`https://open.spotify.com/artist/${artist.uri.split(":")[2]}`.cyan}`)
+                                    }
+
+                                }
+
+                                if (album.genres) {
+                                    if (album.genres.length !== 0) {
+                                        printTextArt("Genres", "Stick Letters");
+                                        for (var genre of album.genres) {
+                                            console.log(genre.yellow);
+                                        }
+                                    }
+                                }
+
+                                if (album.popularity) {
+                                    printTextArt("Ranking", "Stick Letters");
+                                    console.log(album.popularity);
+                                }
+
+                                var trackList = data.items;
+                                if (trackList) {
+                                    printTextArt(`Tracks`, "Stick Letters");
+                                    // Print Tracks
+                                    for (var track of trackList) {
+                                        console.log(`${track.name.bold}: ${`https://open.spotify.com/track/${track.uri.split(":")[2]}`.cyan}`)
+                                    }
+                                }
+
+                                if (album.uri) {
+                                    printTextArt("Album Info", "Stick Letters");
+                                    console.log(`${"Link to Album".bold}: ${`https://open.spotify.com/album/${album.uri.split(":")[2]}`.green}`);
+                                }
+
+
+                                console.log("\n");
+                                // Prompt user for another input
+                                promptRestart();
+                            })
                     }
-
-
-
-
-                    // console.log(response);
-                    printProps(response.albums);
-
-
-                    // Prompt user for another input
-                    promptRestart();
                 })
                 .catch(function (err) {
                     console.log(err);
