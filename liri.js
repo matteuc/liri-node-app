@@ -181,7 +181,7 @@ function queryDatabase() {
                 function (response) {
                     // If no response was returned (ie. movie was not found)
                     if (response.data.Response == "False") {
-                        console.log("Movie was not found! Please try again.".red);
+                        console.log("\nMovie was not found! Please try again.\n".red);
                         return promptQuery();
                     } else {
                         // Log out information here
@@ -289,8 +289,8 @@ function queryDatabase() {
                 .then(function (response) {
 
                     if (response.tracks.items.length === 0) {
-                        console.log(`No tracks named ${query.split("+").join(" ")} were found!`.red);
-                        promptRestart();
+                        console.log(`\nNo tracks named ${query.split("+").join(" ")} were found!\n`.red);
+                        return promptQuery();
                     } else { // Inform user a result has been found
                         console.log(`\nThe best song match for ${query.split("+").join(" ")} is:\n`.magenta);
 
@@ -342,8 +342,8 @@ function queryDatabase() {
                 })
                 .then(function (response) {
                     if (response.artists.items.length === 0) {
-                        console.log(`No artists named ${query.split("+").join(" ")} were found!`.red);
-                        promptRestart();
+                        console.log(`\nNo artists named ${query.split("+").join(" ")} were found!\n`.red);
+                        return promptQuery();
                     } else { // Inform user a result has been found
                         console.log(`\nThe best artist match for ${query.split("+").join(" ")} is:\n`.magenta);
 
@@ -389,9 +389,9 @@ function queryDatabase() {
                 })
                 .then(function (response) {
                     if (response.albums.items.length === 0) {
-                        console.log(`No albums named ${query.split("+").join(" ")} were found!`.red);
+                        console.log(`\nNo albums named ${query.split("+").join(" ")} were found!\n`.red);
 
-                        promptRestart();
+                        return promptQuery();
                     } else {
                         var album = response.albums.items[0];
 
@@ -457,21 +457,50 @@ function queryDatabase() {
     }
 
     function queryConcert() {
-        var queryURL = "https://rest.bandsintown.com/artists/" + query + "?app_id=codingbootcamp";
+        var queryURL = "https://rest.bandsintown.com/artists/" + query + "/events?app_id=codingbootcamp";
 
         packages.axios.get(queryURL)
             .then(
                 function (response) {
                     // If no response was returned (ie. band was not found)
-                    if (response.data.Response == "False") {
-                        console.log("Band was not found! Please try again.");
+                    if (response.data == "\n{warn=Not found}\n") {
+                        console.log("\nBand was not found! Please try again.\n".red);
                         return promptQuery();
                     } else {
+                        console.log("\n");
+                        // Print artist/band name
+                        printTextArt(`${query.split('+').join(' ')}`, "ANSI Shadow");
+
                         // Log out information here
 
+                        var events = response.data;
 
-                        console.log(`${response.data.name} data was retrieved!`);
+                        if (events.length !== 0) {
+                            for (var event of events) {
+                                // Log event information here!
+                                console.log("◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈")
+                                printTextArt("The Venue", "Stick Letters")
+                                console.log(event.venue.name.magenta.bold);
+                                printTextArt("The Location", "Stick Letters")
+                                console.log(event.venue.latitude.bold, event.venue.longitude.bold);
+                                console.log(`${event.venue.city.cyan}, ${event.venue.region.cyan} ${event.venue.country.cyan}`)
+                                printTextArt("The Date", "Stick Letters")
+                                var splitDate = event.datetime.split("T");
+                                var date = splitDate[0];
+                                var time = splitDate[1];
+                                console.log(packages.moment(time, "HH:mm:ss").format("h:mm:ss a").yellow.bold);
+                                console.log(packages.moment(date).format("MMMM D, YYYY").yellow);
+                                if (event.offers[0]) {
+                                    printTextArt("The Tickets", "Stick Letters");
+                                    console.log(event.offers[0].url.green);
+                                }
 
+                            }
+                        } else {
+                            console.log(`No events were found for ${query.split('+').join(' ')}`);
+                        }
+
+                        console.log("\n");
                         // Prompt user for another input
                         promptRestart();
 
