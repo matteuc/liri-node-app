@@ -75,62 +75,62 @@ All the above APIs were accessed via **axios**, with the exception of the Spotif
 ### Music
 To find your favorite song, artist or album, select the 'Search up music!' option. 
 
- ![Choosing the Spotify API.](/assets/media/databaseChoice-music.png "Choosing the Spotify API")
+ ![Choosing the Spotify API.](/assets/media/databaseChoice-music.PNG "Choosing the Spotify API")
 
  After entering your query, you will be prompted on what type of result you would like to see (i.e song, artist, album).
 
- ![Choosing the Spotify API option.](/assets/media/apiChoice-music.png "Choosing the Spotify API option")
+ ![Choosing the Spotify API option.](/assets/media/apiChoice-music.PNG "Choosing the Spotify API option")
 
  After selecting your choice, the result will print out (assuming that the query is valid).
 
- ![Spotify result.](/assets/media/result-music.png "Spotify result")
+ ![Spotify result.](/assets/media/result-music.PNG "Spotify result")
 
 If the query is not valid, an error will display and you will be reprompted.
 
-![Spotify error.](/assets/media/error-music.png "Spotify error")
+![Spotify error.](/assets/media/error-music.PNG "Spotify error")
 
 ### Movies
 To find your favorite movie, select the 'Search up movies!' option. 
 
- ![Choosing the OMDB API.](/assets/media/databaseChoice-movie.png "Choosing the OMDB API")
+ ![Choosing the OMDB API.](/assets/media/databaseChoice-movie.PNG "Choosing the OMDB API")
 
  After entering your query, the result will print out (assuming that the query is valid).
 
- ![OMDB result.](/assets/media/result-movie.png "OMDB result")
+ ![OMDB result.](/assets/media/result-movie.PNG "OMDB result")
 
 If the query is not valid, an error will display and you will be reprompted.
 
-![OMDB error.](/assets/media/error-movie.png "OMDB error")
+![OMDB error.](/assets/media/error-movie.PNG "OMDB error")
 
 ### Concerts
 To find concerts for your favorite artist, select the 'Search up concerts!' option. 
 
- ![Choosing the Bands in Town API.](/assets/media/databaseChoice-concert.png "Choosing the Bands in Town API")
+ ![Choosing the Bands in Town API.](/assets/media/databaseChoice-concert.PNG "Choosing the Bands in Town API")
 
  After entering your query, the result will print out (assuming that the query is valid).
 
- ![Bands in Town result.](/assets/media/result-concert.png "Bands in Town result")
+ ![Bands in Town result.](/assets/media/result-concert.PNG "Bands in Town result")
 
 If the query is not valid, an error will display and you will be reprompted.
 
-![Bands in Town error.](/assets/media/error-concert.png "Bands in Town error")
+![Bands in Town error.](/assets/media/error-concert.PNG "Bands in Town error")
 
 ### TV
 To find your favorite TV show or actor/actress, select the 'Search up TV shows!' option. 
 
- ![Choosing the TVmaze API.](/assets/media/databaseChoice-tv.png "Choosing the TVmaze API")
+ ![Choosing the TVmaze API.](/assets/media/databaseChoice-tv.PNG "Choosing the TVmaze API")
 
  After entering your query, you will be prompted on what type of result you would like to see (i.e TV show or actor/actress).
 
- ![Choosing the TVmaze API option.](/assets/media/apiChoice-tv.png "Choosing the TVmaze API option")
+ ![Choosing the TVmaze API option.](/assets/media/apiChoice-tv.PNG "Choosing the TVmaze API option")
 
  After selecting your choice, the result will print out (assuming that the query is valid).
 
- ![TVmaze result.](/assets/media/result-tv.png "TVmaze result")
+ ![TVmaze result.](/assets/media/result-tv.PNG "TVmaze result")
 
 If the query is not valid, an error will display and you will be reprompted.
 
-![TVmaze error.](/assets/media/error-tv.png "TVmaze error")
+![TVmaze error.](/assets/media/error-tv.PNG "TVmaze error")
 
 
 
