@@ -31,6 +31,10 @@ if (process.argv[2]) {
             case "tv":
                 database = "tvMaze";
                 break;
+            default:
+                console.log("Command type not recognized.".red);
+                return console.log("Type must be: movie, music, concert, tv.".yellow);
+
         }
 
         query = commandArgs[1];
@@ -49,7 +53,7 @@ function promptUser() {
         var omdbText = "~ OMDB ~";
         var spotifyText = "~ Spotify ~";
         var bandsText = "~ Bands In Town ~";
-        var tvText = "~ TV Maze ~"
+        var tvText = "~ TVmaze ~"
 
         switch (database) {
             case "omdb":
@@ -496,7 +500,7 @@ function queryDatabase() {
                         if (events.length !== 0) {
                             for (var event of events) {
                                 // Log event information here!
-                                console.log("◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈◈")
+                                console.log("≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈")
                                 printTextArt("The Venue", "Stick Letters")
                                 console.log(event.venue.name.magenta.bold);
                                 printTextArt("The Location", "Stick Letters")
@@ -586,7 +590,7 @@ function queryDatabase() {
                 promptRestart();
             }).catch(function (err) {
                 if (err) {
-                    console.log(`No shows named ${query.bold} were found.\n`);
+                    console.log(`No shows named ${query.bold} were found.\n`.red);
                     return promptQuery();
                 }
             });
