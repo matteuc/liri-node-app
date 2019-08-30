@@ -7,7 +7,7 @@ var usage = "node liri.js [optional: path to command file]";
 var database, query;
 
 // Choices to be prompted to user (databases in promptUser & queryDatabase)
-var databaseChoices = ["Search up music!", "Search up movies!", "Search up concerts!"];
+var databaseChoices = ["Search up music!", "Search up movies!", "Search up concerts!", "Search up TV shows!"];
 
 // Allow for file to be passed in as the command (process.argv[2])
 if (process.argv[2]) {
@@ -28,6 +28,9 @@ if (process.argv[2]) {
             case "concert":
                 database = "bandsInTown";
                 break;
+            case "tv":
+                database = "tvMaze";
+                break;
         }
 
         query = commandArgs[1];
@@ -46,6 +49,7 @@ function promptUser() {
         var omdbText = "~ OMDB ~";
         var spotifyText = "~ Spotify ~";
         var bandsText = "~ Bands In Town ~";
+        var tvText = "~ TV Maze ~"
 
         switch (database) {
             case "omdb":
@@ -56,6 +60,9 @@ function promptUser() {
                 break;
             case "bandsInTown":
                 artText = bandsText;
+                break;
+            case "tvMaze":
+                artText = tvText;
                 break;
         }
 
@@ -83,6 +90,10 @@ function promptUser() {
             case "Search up concerts!":
                 database = "bandsInTown";
                 break;
+            case "Search up TV shows!":
+                database = "tvMaze";
+                break;
+
         }
 
         console.log("\n");
@@ -97,10 +108,11 @@ function promptQuery() {
     var moviePrompt = "What film would you like to know more about?";
     var musicPrompt = "What do you want to jam out to today?";
     var concertPrompt = "What concert do you want to go to?";
+    var tvPrompt = "What TV show do you want to watch?";
     var queryPrompt = "";
 
     // set the appropriate prompt
-    (database == "omdb") ? queryPrompt = moviePrompt: (database == "spotify") ? queryPrompt = musicPrompt : (database == "bandsInTown") ? queryPrompt = concertPrompt : '';
+    (database == "omdb") ? queryPrompt = moviePrompt: (database == "spotify") ? queryPrompt = musicPrompt : (database == "bandsInTown") ? queryPrompt = concertPrompt : (database == "tvMaze") ? queryPrompt = tvPrompt : '';
 
     // Prompt user with customized message
     packages.inquirer.prompt([{
@@ -133,6 +145,9 @@ function promptRestart() {
             break;
         case "bandsInTown":
             term = "concert";
+            break;
+        case "tvMaze":
+            term = "TV show";
             break;
     }
 
@@ -169,6 +184,9 @@ function queryDatabase() {
             break;
         case "bandsInTown":
             queryConcert();
+            break;
+        case "tvMaze":
+            queryTVshow();
             break;
     }
 
@@ -508,12 +526,133 @@ function queryDatabase() {
                 })
     }
 
+    function queryTVshow() {
+        var optionPrompts = {
+            showPrompt: "... a TV show?",
+            personPrompt: "... an actor/actress?"
+        }
+
+        packages.inquirer.prompt([{
+            name: "apiOption",
+            type: "list",
+            message: `Would you like to search ${query.split("+").join(" ")} as...`,
+            choices: [optionPrompts.showPrompt, optionPrompts.personPrompt]
+        }]).then(function (answers) {
+            console.log("Loading...".yellow);
+            switch (answers.apiOption) {
+                case optionPrompts.showPrompt:
+                    queryShow();
+                    break;
+                case optionPrompts.personPrompt:
+                    queryPerson();
+                    break;
+            }
+
+        });
+
+        function queryShow() {
+            packages.axios.get(`http://api.tvmaze.com/singlesearch/shows?q=${query}`).then(function (res) {
+                var show = {
+                    name: res.data.name,
+                    genres: res.data.genres.join(", "),
+                    rating: res.data.rating[Object.keys(res.data.rating)[0]],
+                    network: res.data.network,
+                    summary: res.data.summary
+                }
+
+                console.log(`\nThe best show match for ${query.split("+").join(" ")} is:\n`.magenta);
+
+                // Print show title
+                printTextArt(show.name, "ANSI Shadow");
+                // Print Show information
+                if (show.genres) {
+                    printTextArt("Genres", "Stick Letters");
+                    console.log(show.genres.yellow);
+                }
+                if (show.rating) {
+                    printTextArt("Rating", "Stick Letters");
+                    console.log(show.rating.green);
+                }
+                if (show.network) {
+                    printTextArt("Network", "Stick Letters");
+                    console.log(show.network.blue);
+                }
+                if (show.summary) {
+                    printTextArt("Summary", "Stick Letters");
+                    console.log(show.summary.bold);
+                }
+
+                console.log("\n");
+                promptRestart();
+            }).catch(function (err) {
+                if (err) {
+                    console.log(`No shows named ${query.bold} were found.\n`);
+                    return promptQuery();
+                }
+            });
+        }
+
+        function queryPerson() {
+            packages.axios.get(`http://api.tvmaze.com/search/people?q=${query}`).then(function (res) {
+
+                var actorData = res.data[0].person;
+                var actor = {
+                    name: actorData.name,
+                    gender: actorData.gender,
+                    birthday: actorData.birthday,
+                    country: actorData.country.name,
+                    url: actorData.url
+                }
+
+                console.log(`\nThe best person match for ${query.split("+").join(" ")} is:\n`.magenta);
+
+                // Print show title
+                printTextArt(actor.name, "ANSI Shadow");
+                // Print Show information
+                if (actor.gender) {
+                    printTextArt("Gender", "Stick Letters");
+                    console.log(actor.gender.blue);
+                }
+                if (actor.birthday) {
+                    printTextArt("Birthday", "Stick Letters");
+                    console.log(actor.birthday.yellow);
+                }
+                if (actor.country) {
+                    printTextArt("Country", "Stick Letters");
+                    console.log(actor.country.bold);
+                }
+                if (actor.url) {
+                    printTextArt("Full Profile", "Stick Letters");
+                    console.log(actor.url.green);
+                }
+
+                console.log("\n");
+                promptRestart();
+
+
+            }).catch(function (err) {
+                if (err) {
+                    console.log(`No people named ${query.bold} were found.\n`);
+                    return promptQuery();
+                }
+            });
+        }
+
+    }
+
 }
 
 // Print the properties of the specified object
 function printProps(obj) {
-    for (var prop of obj) {
+    for (var prop in obj) {
         console.log(prop);
+    }
+}
+
+// Print the items of the specified array
+function printItems(arr) {
+    for (var item of arr) {
+        console.log(item);
     }
 }
 
